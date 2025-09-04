@@ -21,14 +21,15 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
+# Pin dependency versions for security and reproducibility
 dependencies = [
-    "beautifulsoup4>=4.13.3",
-    "humanize>=4.13",
-    "mcp>=1.9",
-    "pydantic>=2.10.6",
-    "requests>=2.32.3",
-    "rich-click>=1.8.8",
-    "youtube-transcript-api>=1.1",
+    "beautifulsoup4>=4.13.3,<5.0.0",
+    "humanize>=4.13,<5.0.0",
+    "mcp>=1.9,<2.0.0",
+    "pydantic>=2.10.6,<3.0.0",
+    "requests>=2.32.3,<3.0.0",
+    "rich-click>=1.8.8,<2.0.0",
+    "youtube-transcript-api>=1.1,<2.0.0",
     "yt-dlp>=2025.9.26",
 ]
 scripts.mcp-youtube-transcript = "mcp_youtube_transcript.cli:main"
@@ -40,13 +41,30 @@ dev = [
     "pre-commit-uv>=4.1.4",
     "pytest>=8.3.5",
     "pytest-mock>=3.14",
-    "pytest-recording>=0.13.4",
     "types-requests>=2.32.0.20250306",
+    "ruff>=0.1.0",
+    "bandit>=1.7.0",
 ]
 
 [tool.ruff]
 target-version = "py310"
 line-length = 120
+
+# Add security-focused ruff rules
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "S",   # flake8-bandit (security)
+    "T20", # flake8-print
+    "Q",   # flake8-quotes
+]
+ignore = [
+    "S101", # Allow assert statements (common in tests)
+]
 
 [tool.pyproject-fmt]
 indent = 4
@@ -55,6 +73,7 @@ indent = 4
 disallow_untyped_defs = true
 warn_return_any = true
 warn_unused_configs = true
+strict = true
 overrides = [ { module = [
     "yt_dlp.*",
 ], ignore_missing_imports = true } ]
@@ -72,3 +91,11 @@ pre_commit_hooks = [
     "uv sync",
     "git add uv.lock",
 ]
+
+# Security scanning configuration
+[tool.bandit]
+exclude_dirs = ["tests"]
+skips = ["B101"]  # Skip assert_used test
+
+[tool.safety]
+ignore = []  # Add CVE IDs to ignore if needed
